@@ -1,29 +1,24 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import *
 from .models import *
-
-menu = [{'title': "О сайте", 'url_name': 'about'},
-        {'title': "Добавить статью", 'url_name': 'add_page'},
-        {'title': "Обратная связь", 'url_name': 'contact'},
-        {'title': "Войти", 'url_name': 'login'}
-]
+from .utils import *
 
 # отображение данных в виде списка через классы
-class WomenHome(ListView):
+class WomenHome(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html' # по умолчанию ищет women/women_list.html
     context_object_name = 'posts' # имя переменной, чтобы перебирать объекты для index.html
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu # выводит меню на сайт
-        context['title'] = 'Главная страница' # заголовок вкладки
-        context['cat_selected'] = 0
-        return context
+        c_def = self.get_user_context(title="Главная страница")
+        return dict(list(context.items()) + list(c_def.items()))
 
     # можем читать не всю модель Women, а с определенным условием
     def get_queryset(self):
@@ -40,20 +35,22 @@ class WomenHome(ListView):
 #     }
 #     return render(request, 'women/index.html', context=context)
 
+# @login_required для функции можно использовать декоратор, чтобы ограничить доступ к странице
 def about(request):
     return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
 
-# класс для создания статьи
-class AddPage(CreateView):
+# класс для создания статьи. Здесь уже используются миксины, для ограничения доступа, а не декораторы
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     success_url = reverse_lazy('home') # после добавления статьи переходит на этот маршрут. По умолчанию переходит на созданную статью
+    login_url = reverse_lazy('home') # если не авторизован, то перенаправляет на главную страницу
+    raise_exception = True # если хотим, чтобы генерировалась страница 403: доступ запрещен
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = 'Добавление статьи'
-        return context
+        c_def = self.get_user_context(title="Добавление статьи")
+        return dict(list(context.items()) + list(c_def.items()))
 
 # def addpage(request):
 #     if request.method == 'POST':
@@ -88,7 +85,7 @@ def pageNotFound(request, exception):
 #     return render(request, 'women/post.html', context=context)
 
 # класс DetailView используется для показа материала
-class ShowPost(DetailView):
+class ShowPost(DataMixin, DetailView):
     model = Women
     template_name = 'women/post.html'
     slug_url_kwarg = 'post_slug' # используем свою переменную для slug статьи
@@ -96,11 +93,10 @@ class ShowPost(DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = context['post']
-        return context
+        c_def = self.get_user_context(title=context['post'])
+        return dict(list(context.items()) + list(c_def.items()))
 
-class WomenCategory(ListView):
+class WomenCategory(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html'
     context_object_name = 'posts'
@@ -114,7 +110,9 @@ class WomenCategory(ListView):
         context['title'] = 'Категория - ' + str(context['posts'][0].cat)
         context['menu'] = menu
         context['cat_selected'] = context['posts'][0].cat_id
-        return context
+        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
+                                      cat_selected=context['posts'][0].cat_id)
+        return dict(list(context.items()) + list(c_def.items()))
 
 # def show_category(request, cat_slug):
 #     cat = Category.objects.get(slug=cat_slug)
