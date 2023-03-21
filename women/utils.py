@@ -10,6 +10,8 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
 
 # класс, чтобы убрать повторяющийся код
 class DataMixin:
+    paginate_by = 3  # количество статей на одной странице (пагинатор уже встроен в ListView)
+
     def get_user_context(self, **kwargs):
         context = kwargs
         cats = Category.objects.annotate(Count('women')) # дополнительно прочитываем количество статей в категории (Count)

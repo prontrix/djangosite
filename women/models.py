@@ -23,7 +23,7 @@ class Women(models.Model):
     class Meta: # все изменения только для админки
         verbose_name = 'Известные женщины' # отображаемое имя вместо Womens
         verbose_name_plural = 'Известные женщины' # множественное число в списке слева
-        ordering = ['-time_create', 'title'] # сортировка статей (работает и в админке, и на сайте)
+        ordering = ['id'] # сортировка статей (работает и в админке, и на сайте)
 
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name="Категория")
