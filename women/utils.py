@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.core.cache import cache
 
 from .models import *
 
@@ -7,13 +8,17 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Обратная связь", 'url_name': 'contact'},
 ]
 
-# класс, чтобы убрать повторяющийся код
+# класс, чтобы убрать повторяющийся код из views.py
 class DataMixin:
     paginate_by = 3  # количество статей на одной странице (пагинатор уже встроен в ListView)
 
     def get_user_context(self, **kwargs):
         context = kwargs
-        cats = Category.objects.annotate(Count('women')) # дополнительно прочитываем количество статей в категории (Count)
+        cats = cache.get('cats') # используем кеш, чтобы читать категории (кеш уровня API)
+        if not cats:
+            cats = Category.objects.annotate(Count('women')) # дополнительно прочитываем количество статей в категории (Count); annotate - "ленивый", отложенный запрос. Выполняется, только при обращении к категориям в шаблоне
+            cache.set('cats', cats, 60)
+
         user_menu = menu.copy()
         if not self.request.user.is_authenticated: # проверяем авторизован ли пользователь, и если нет, то убираем пункт "Добавить статью"
             user_menu.pop(1)

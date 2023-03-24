@@ -1,9 +1,11 @@
 from django.urls import path, re_path
+from django.views.decorators.cache import cache_page
 
 from .views import *
 
 urlpatterns = [
-    path('', WomenHome.as_view(), name='home'), # привязываем не просто метод, а целый класс для отображения главной страницы
+    # path('', cache_page(60)(WomenHome.as_view()), name='home'), # привязываем не просто метод, а целый класс для отображения главной страницы; cache_page - кешируем главную страницу на 60 секунд
+    path('', WomenHome.as_view(), name='home'),
     path('about/', about, name='about'),
     path('addpage/', AddPage.as_view(), name='add_page'),
     path('contact/', contact, name='contact'),
