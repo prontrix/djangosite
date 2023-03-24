@@ -25,7 +25,7 @@ class WomenHome(DataMixin, ListView):
 
     # можем читать не всю модель Women, а с определенным условием
     def get_queryset(self):
-        return Women.objects.filter(is_published=True)
+        return Women.objects.filter(is_published=True).select_related('cat') # select_related - использование "жадного" запроса, чтобы сразу получить нужные категории, а не читать отдельно для каждой статьи
 
 # def index(request):
 #     posts = Women.objects.all()
@@ -111,15 +111,13 @@ class WomenCategory(DataMixin, ListView):
     allow_empty = False # показывать страницу 404, если категория не найдена
 
     def get_queryset(self):
-        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
-        context['menu'] = menu
-        context['cat_selected'] = context['posts'][0].cat_id
-        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
-                                      cat_selected=context['posts'][0].cat_id)
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])
+        c_def = self.get_user_context(title='Категория - ' + str(c.name),
+                                      cat_selected=c.pk)
         return dict(list(context.items()) + list(c_def.items()))
 
 # def show_category(request, cat_slug):
