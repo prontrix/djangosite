@@ -47,5 +47,5 @@
 
 ## **Источник**
 
-Огромная благодарность Сергею Балакиреву, автору канала на youtube <a href = "https://www.youtube.com/@selfedu_rus/" target = _blank>selfedu</a> за легкую и доступную подачу материала о создании сайта на Django Framework. Ссылка на плейлист: <a href="https://www.youtube.com/watch?v=FyTL1bnUx5I&list=PLA0M1Bcd0w8xO_39zZll2u1lz_Q-Mwn1F" target = _blank>Django 3 для python (уроки)</a>
+Огромная благодарность Сергею Балакиреву, автору канала на youtube <a href = "https://www.youtube.com/@selfedu_rus/" target = "_blank">selfedu</a> за легкую и доступную подачу материала о создании сайта на Django Framework. Ссылка на плейлист: <a href="https://www.youtube.com/watch?v=FyTL1bnUx5I&list=PLA0M1Bcd0w8xO_39zZll2u1lz_Q-Mwn1F" target = _blank>Django 3 для python (уроки)</a>
 
