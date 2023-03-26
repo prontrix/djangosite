@@ -31,6 +31,10 @@
 
    <img src = "https://user-images.githubusercontent.com/60534525/227757131-e73de31f-9c33-4d2a-9cab-16ea5eee143a.jpg" width = 300 />
    
-4. Открываем папку djangosite 
+4. Открываем папку `djangosite` (или `djangosite-main`) 
 5. Устанавливаем виртуальное окружение `python -m venv venv`
 6. Активируем виртуальное окружение для Linux: `source venv/Scripts/activate`, для Windows: `venv\Scripts\activate`
+7. Обновляем pip `python -m pip install --upgrade pip`
+8. Устанавливаем нужные зависимости для проекта `python -m pip install --no-cache-dir -r requirements.txt`
+9. Запускаем локальный сервер `python manage.py runserver`
+10. Если все прошло корректно, без ошибок, то сайт будет доступен по адресу `127.0.0.1:8000`
